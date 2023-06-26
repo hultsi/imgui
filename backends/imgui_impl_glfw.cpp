@@ -325,8 +325,19 @@ void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int acti
     ImGui_ImplGlfw_UpdateKeyModifiers(window);
 
     ImGuiIO& io = ImGui::GetIO();
-    if (button >= 0 && button < ImGuiMouseButton_COUNT)
+    if (button >= 0 && button < ImGuiMouseButton_COUNT) {
+#ifndef _WIN32
+#ifndef __EMSCRIPTEN__
+        // TODO: This is hack for x11 
+        // TODO: Needs a check for other mouse releases as well (e.g., right mouse release)
+        const bool mouseRelease = (mods >> 6 & 0x1);
+        if (button == 0 && action == GLFW_RELEASE && !mouseRelease) {
+            action = GLFW_PRESS;
+        }
+#endif
+#endif
         io.AddMouseButtonEvent(button, action == GLFW_PRESS);
+    }
 }
 
 void ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
