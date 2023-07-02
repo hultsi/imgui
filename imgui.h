@@ -50,6 +50,12 @@ Index of this file:
 
 #pragma once
 
+// Todo: Maybe use IMGUI_USER_CONFIG instead
+#ifndef USE_IMVEC2
+#include "../app/geometry/Point.hpp"
+#define ImVec2 EasyPlot::geometry::Point
+#endif
+
 // Configuration file with compile-time options
 // (edit imconfig.h or '#define IMGUI_USER_CONFIG "myfilename.h" from your build system')
 #ifdef IMGUI_USER_CONFIG
@@ -256,6 +262,7 @@ typedef void    (*ImGuiMemFreeFunc)(void* ptr, void* user_data);                
 
 // ImVec2: 2D vector used to store positions, sizes etc. [Compile-time configurable type]
 // This is a frequently used type in the API. Consider using IM_VEC2_CLASS_EXTRA to create implicit cast from/to our preferred type.
+#ifdef USE_IMVEC2
 IM_MSVC_RUNTIME_CHECKS_OFF
 struct ImVec2
 {
@@ -268,6 +275,7 @@ struct ImVec2
     IM_VEC2_CLASS_EXTRA     // Define additional constructors and implicit cast operators in imconfig.h to convert back and forth between your math types and ImVec2.
 #endif
 };
+#endif
 
 // ImVec4: 4D vector used to store clipping rectangles, colors etc. [Compile-time configurable type]
 struct ImVec4
