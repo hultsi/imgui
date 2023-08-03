@@ -14,4 +14,5 @@ add_library(
 target_include_directories(ImGui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/backends
+    ${CMAKE_CURRENT_SOURCE_DIR}/examples/libs/glfw/include
 )

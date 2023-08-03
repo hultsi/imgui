@@ -52,8 +52,8 @@ Index of this file:
 
 // Todo: Maybe use IMGUI_USER_CONFIG instead
 #ifndef USE_IMVEC2
-#include "../app/geometry/Point.hpp"
-#define ImVec2 EasyPlot::geometry::Point
+#include "../app/geometry/Vector2.hpp"
+#define ImVec2 EasyPlot::geometry::Vector2
 #endif
 
 // Configuration file with compile-time options
