@@ -50,12 +50,6 @@ Index of this file:
 
 #pragma once
 
-// Todo: Maybe use IMGUI_USER_CONFIG instead
-#ifndef USE_IMVEC2
-#include "../app/geometry/Vector2.hpp"
-#define ImVec2 EasyPlot::geometry::Vector2
-#endif
-
 // Configuration file with compile-time options
 // (edit imconfig.h or '#define IMGUI_USER_CONFIG "myfilename.h" from your build system')
 #ifdef IMGUI_USER_CONFIG
@@ -262,20 +256,23 @@ typedef void    (*ImGuiMemFreeFunc)(void* ptr, void* user_data);                
 
 // ImVec2: 2D vector used to store positions, sizes etc. [Compile-time configurable type]
 // This is a frequently used type in the API. Consider using IM_VEC2_CLASS_EXTRA to create implicit cast from/to our preferred type.
-#ifdef USE_IMVEC2
 IM_MSVC_RUNTIME_CHECKS_OFF
 struct ImVec2
 {
     float                                   x, y;
     constexpr ImVec2()                      : x(0.0f), y(0.0f) { }
     constexpr ImVec2(float _x, float _y)    : x(_x), y(_y) { }
+    constexpr ImVec2(float _x, int _y)      : x(_x), y(static_cast<float>(_y)) { }
+    constexpr ImVec2(int _x, float _y)      : x(static_cast<float>(_x)), y(_y) { }
+    constexpr ImVec2(int _x, int _y)        : x(static_cast<float>(_x)), y(static_cast<float>(_y)) { }
+    constexpr ImVec2(double _x, double _y)  : x(static_cast<float>(_x)), y(static_cast<float>(_y)) { }
+
     float& operator[] (size_t idx)          { IM_ASSERT(idx == 0 || idx == 1); return ((float*)(void*)(char*)this)[idx]; } // We very rarely use this [] operator, so the assert overhead is fine.
     float  operator[] (size_t idx) const    { IM_ASSERT(idx == 0 || idx == 1); return ((const float*)(const void*)(const char*)this)[idx]; }
 #ifdef IM_VEC2_CLASS_EXTRA
     IM_VEC2_CLASS_EXTRA     // Define additional constructors and implicit cast operators in imconfig.h to convert back and forth between your math types and ImVec2.
 #endif
 };
-#endif
 
 // ImVec4: 4D vector used to store clipping rectangles, colors etc. [Compile-time configurable type]
 struct ImVec4
