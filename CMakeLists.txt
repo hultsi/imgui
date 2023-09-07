@@ -7,6 +7,7 @@ add_library(
     imgui_tables.cpp
     imgui_widgets.cpp
     imgui_demo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/freetype/imgui_freetype.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
 )
@@ -14,5 +15,6 @@ add_library(
 target_include_directories(ImGui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/backends
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/freetype
     ${CMAKE_CURRENT_SOURCE_DIR}/examples/libs/glfw/include
 )
