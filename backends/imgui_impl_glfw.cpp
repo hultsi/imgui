@@ -244,7 +244,16 @@ ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int keycode, int scancode)
         case GLFW_KEY_ESCAPE: return ImGuiKey_Escape;
         case GLFW_KEY_APOSTROPHE: return ImGuiKey_Apostrophe;
         case GLFW_KEY_COMMA: return ImGuiKey_Comma;
-        case GLFW_KEY_MINUS: return ImGuiKey_Minus;
+        case GLFW_KEY_MINUS: {
+            // TODO: [MYMOD] How to generalize this to more keyboards?
+            if (scancode == 20) {
+                return ImGuiKey_RightBracket;
+            }
+            if (scancode == 61) {
+                return ImGuiKey_Minus;
+            }
+            break;
+        }
         case GLFW_KEY_PERIOD: return ImGuiKey_Period;
         case GLFW_KEY_SLASH: return ImGuiKey_Slash;
         case GLFW_KEY_SEMICOLON: return ImGuiKey_Semicolon;
@@ -344,8 +353,8 @@ ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int keycode, int scancode)
         case GLFW_KEY_F22: return ImGuiKey_F22;
         case GLFW_KEY_F23: return ImGuiKey_F23;
         case GLFW_KEY_F24: return ImGuiKey_F24;
-        default: return ImGuiKey_None;
     }
+    return ImGuiKey_None;
 }
 
 // X11 does not include current pressed/released modifier key in 'mods' flags submitted by GLFW
