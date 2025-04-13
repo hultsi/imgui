@@ -5054,6 +5054,25 @@ void ImGui::StartMouseMovingWindowOrNode(ImGuiWindow* window, ImGuiDockNode* nod
         StartMouseMovingWindow(window);
 }
 
+#ifdef linux
+ImVec2 GetDesktopDimensions()
+{
+    ImVec2 max(-FLT_MAX, -FLT_MAX);
+    const ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+    for (int i = 0; i < platform_io.Monitors.Size; ++i)
+    {
+        const ImGuiPlatformMonitor& monitor = platform_io.Monitors[i];
+        const ImVec2 end = monitor.WorkPos + monitor.WorkSize;
+        if (end.x > max.x) {
+            max.x = end.x;
+        }
+        if (end.y > max.y) {
+            max.y = end.y;
+        }
+    }
+    return max;
+}
+#endif
 // Handle mouse moving window
 // Note: moving window with the navigation keys (Square + d-pad / CTRL+TAB + Arrows) are processed in NavUpdateWindowing()
 // FIXME: We don't have strong guarantee that g.MovingWindow stay synched with g.ActiveId == g.MovingWindow->MoveId.
@@ -5072,9 +5091,30 @@ void ImGui::UpdateMouseMovingWindowNewFrame()
 
         // When a window stop being submitted while being dragged, it may will its viewport until next Begin()
         const bool window_disappared = (!moving_window->WasActive && !moving_window->Active);
+#ifdef linux
+        static bool is_dragging{false};
+        if (g.IO.MouseReleased[0]) {
+            is_dragging = false;
+        }
+#endif
         if (g.IO.MouseDown[0] && IsMousePosValid(&g.IO.MousePos) && !window_disappared)
         {
+#ifdef linux
+            static ImVec2 pos{0, 0};
+            if (!is_dragging) {
+                pos = g.IO.MousePos - g.ActiveIdClickOffset;
+                is_dragging = true;
+            } else {
+                pos += g.IO.MouseDelta;
+            }
+            const ImVec2 monitor_worksize = GetDesktopDimensions();
+            const float max_x = monitor_worksize.x - moving_window->Rect().GetWidth();
+            const float max_y = monitor_worksize.y - moving_window->Rect().GetHeight();
+            pos.x = (pos.x < 0.f ? 0.f : (pos.x > max_x ? max_x : pos.x));
+            pos.y = (pos.y < 0.f ? 0.f : (pos.y > max_y ? max_y : pos.y));
+#else
             ImVec2 pos = g.IO.MousePos - g.ActiveIdClickOffset;
+#endif
             if (moving_window->Pos.x != pos.x || moving_window->Pos.y != pos.y)
             {
                 SetWindowPos(moving_window, pos, ImGuiCond_Always);
