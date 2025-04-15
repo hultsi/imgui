@@ -1164,7 +1164,6 @@ static void ImGui_ImplGlfw_CreateWindow(ImGuiViewport* viewport)
     glfwSetWindowCloseCallback(vd->Window, ImGui_ImplGlfw_WindowCloseCallback);
     glfwSetWindowPosCallback(vd->Window, ImGui_ImplGlfw_WindowPosCallback);
     glfwSetWindowSizeCallback(vd->Window, ImGui_ImplGlfw_WindowSizeCallback);
-
     if (bd->ClientApi == GlfwClientApi_OpenGL)
     {
         glfwMakeContextCurrent(vd->Window);
@@ -1384,6 +1383,13 @@ static void ImGui_ImplGlfw_InitMultiViewportSupport()
     platform_io.Platform_RestoreWindow = [](ImGuiViewport *viewport){
         ImGui_ImplGlfw_ViewportData* vd = (ImGui_ImplGlfw_ViewportData*)viewport->PlatformUserData;
         glfwRestoreWindow(vd->Window);
+    };
+    platform_io.Platform_GetIsWindowMaximized = [](ImGuiViewport *viewport){
+        ImGui_ImplGlfw_ViewportData* vd = (ImGui_ImplGlfw_ViewportData*)viewport->PlatformUserData;
+        if (vd == nullptr) {
+            return 0;
+        }
+        return glfwGetWindowAttrib(vd->Window, GLFW_MAXIMIZED);
     };
 #if GLFW_HAS_WINDOW_ALPHA
     platform_io.Platform_SetWindowAlpha = ImGui_ImplGlfw_SetWindowAlpha;

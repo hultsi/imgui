@@ -5104,13 +5104,19 @@ void ImGui::UpdateMouseMovingWindowNewFrame()
 #ifdef IMGUI_USE_X11
             static ImVec2 pos{0, 0};
             if (!is_dragging) {
-                if (g.PlatformIO.Platform_RestoreWindow) {
-                    g.PlatformIO.Platform_RestoreWindow((ImGuiViewport*)moving_window->Viewport);
-                }
                 pos = g.IO.MousePos - g.ActiveIdClickOffset;
                 is_dragging = true;
             } else {
+                if (g.IO.MousePos.x > moving_window->Pos.x + moving_window->Rect().GetWidth()) {
+                    pos.x = g.IO.MousePos.x - moving_window->Rect().GetWidth();
+                }
+                if (g.IO.MousePos.y > moving_window->Pos.y + moving_window->Rect().GetHeight()) {
+                    pos.y = g.IO.MousePos.y - moving_window->Rect().GetHeight();
+                }
                 pos += g.IO.MouseDelta;
+            }
+            if (g.PlatformIO.Platform_RestoreWindow && (g.IO.MouseDelta.x != 0.f || g.IO.MouseDelta.y != 0.f)) {
+                g.PlatformIO.Platform_RestoreWindow((ImGuiViewport*)moving_window->Viewport);
             }
             const ImVec2 monitor_worksize = GetDesktopDimensions();
             const float max_x = monitor_worksize.x - moving_window->Rect().GetWidth();
@@ -6841,7 +6847,12 @@ static int ImGui::UpdateWindowManualResize(ImGuiWindow* window, const ImVec2& si
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindowFlags flags = window->Flags;
-
+#ifdef IMGUI_USE_X11
+    // OS level tiling messes up glfw so just prevent resizing when window is tiled
+    if (g.PlatformIO.Platform_GetIsWindowMaximized(window->Viewport)) {
+        return false;
+    }
+#endif
     if ((flags & ImGuiWindowFlags_NoResize) || (flags & ImGuiWindowFlags_AlwaysAutoResize) || window->AutoFitFramesX > 0 || window->AutoFitFramesY > 0)
         return false;
     if (window->WasActive == false) // Early out to avoid running this code for e.g. a hidden implicit/fallback Debug window.
@@ -7957,7 +7968,6 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
             window->Viewport->UpdateWorkRect();
             viewport_rect = window->Viewport->GetMainRect();
         }
-
         // Save last known viewport position within the window itself (so it can be saved in .ini file and restored)
         window->ViewportPos = window->Viewport->Pos;
 

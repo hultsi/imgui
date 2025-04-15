@@ -3820,6 +3820,7 @@ struct ImGuiPlatformIO
 
     // My additions
     void    (*Platform_RestoreWindow)(ImGuiViewport* vp){nullptr};          // . . U . .  // Windows that are docked on OS level can be restored with this
+    int     (*Platform_GetIsWindowMaximized)(ImGuiViewport* vp){nullptr};   // . . U . .  // Get window's maximized state
 
     // (Optional) Monitor list
     // - Updated by: app/backend. Update every frame to dynamically support changing monitor or DPI configuration.
