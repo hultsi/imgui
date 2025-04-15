@@ -17011,12 +17011,37 @@ void ImGui::DockContextNewFrameUpdateDocking(ImGuiContext* ctx)
             DockContextProcessDock(ctx, &req);
     dc->Requests.resize(0);
 
+    // Merge lone siblings to parent
+    for (int n = 0; n < dc->Nodes.Data.Size; ++n) {
+        ImGuiDockNode* node = (ImGuiDockNode*)dc->Nodes.Data[n].val_p;
+        if (node == nullptr) {
+            continue;
+        }
+        const auto parent = node->ParentNode;
+        if (parent == nullptr) {
+            continue;
+        }
+        if (parent->ParentNode == nullptr) {
+            continue;
+        }
+        if (parent->ChildNodes[0]->IsEmpty()) {
+            DockContextRemoveNode(ctx, parent->ChildNodes[0], true);
+            n = -1;
+        } else if (parent->ChildNodes[1]->IsEmpty()) {
+            DockContextRemoveNode(ctx, parent->ChildNodes[1], true);
+            n = -1;
+        }
+    }
+
     // Create windows for each automatic docking nodes
     // We can have NULL pointers when we delete nodes, but because ID are recycled this should amortize nicely (and our node count will never be very high)
-    for (int n = 0; n < dc->Nodes.Data.Size; n++)
-        if (ImGuiDockNode* node = (ImGuiDockNode*)dc->Nodes.Data[n].val_p)
-            if (node->IsFloatingNode())
+    for (int n = 0; n < dc->Nodes.Data.Size; n++) {
+        if (ImGuiDockNode* node = (ImGuiDockNode*)dc->Nodes.Data[n].val_p) {
+            if (node->IsFloatingNode()) {
                 DockNodeUpdate(node);
+            }
+        }
+    }
 }
 
 void ImGui::DockContextEndFrame(ImGuiContext* ctx)
