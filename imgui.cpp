@@ -4142,7 +4142,7 @@ void ImGui::RenderNavCursor(const ImRect& bb, ImGuiID id, ImGuiNavRenderCursorFl
         display_rect.Expand(ImVec2(distance, distance));
         bool fully_visible = window->ClipRect.Contains(display_rect);
         if (!fully_visible)
-            window->DrawList->PushClipRect(display_rect.Min, display_rect.Max);
+            window->DrawList->PushClipRect(display_rect.Min, display_rect.Max, true);
         window->DrawList->AddRect(display_rect.Min, display_rect.Max, GetColorU32(ImGuiCol_NavCursor), rounding, thickness);
         if (!fully_visible)
             window->DrawList->PopClipRect();
